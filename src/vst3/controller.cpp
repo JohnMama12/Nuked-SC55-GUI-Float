@@ -36,16 +36,4 @@ Steinberg::Vst::IPlugView* PLUGIN_API Controller::createView(Steinberg::FIDStrin
     return nullptr;
 }
 
-Steinberg::tresult PLUGIN_API Controller::setState(Steinberg::IBStream* state)
-{
-    // For now, we don't save any state
-    return Steinberg::kResultOk;
-}
-
-Steinberg::tresult PLUGIN_API Controller::getState(Steinberg::IBStream* state)
-{
-    // For now, we don't save any state
-    return Steinberg::kResultOk;
-}
-
 } // namespace VST3

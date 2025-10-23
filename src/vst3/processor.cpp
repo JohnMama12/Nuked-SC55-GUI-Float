@@ -1,5 +1,6 @@
 #include "processor.h"
 #include "backend/audio.h"
+#include "win32_helper.h"
 
 namespace VST3 {
 
@@ -25,14 +26,54 @@ Steinberg::tresult PLUGIN_API Processor::initialize(FUnknown* context)
         return result;
     }
 
+    // Get the ROM path
+    std::filesystem::path romPath = Win32::getRomPathFromRegistry();
+    if (romPath.empty()) {
+        romPath = Win32::openFolderDialog();
+        if (!romPath.empty()) {
+            Win32::setRomPathInRegistry(romPath);
+        }
+    }
+
     // Create the emulator
     m_emu = std::make_unique<Emu>();
+    EMU_Options options;
+    options.rom_directory = romPath;
+    options.lcd_backend = m_lcdView;
+    if (!m_emu->Init(options)) {
+        Win32::showErrorMessage("Failed to initialize the emulator.");
+        return Steinberg::kResultFalse;
+    }
+
+    // Load the ROM set
+    if (std::filesystem::exists(romPath / "sc55_rom1.bin")) {
+        if (!m_emu->LoadRoms(Romset::MK1)) {
+            Win32::showErrorMessage("Failed to load the SC-55 MKI ROM files. Please check that the files are not corrupted and that they are in the correct location.");
+            return Steinberg::kResultFalse;
+        }
+    } else if (std::filesystem::exists(romPath / "rom1.bin")) {
+        if (!m_emu->LoadRoms(Romset::MK2)) {
+            Win32::showErrorMessage("Failed to load the SC-55 MKII ROM files. Please check that the files are not corrupted and that they are in the correct location.");
+            return Steinberg::kResultFalse;
+        }
+    } else {
+        Win32::showErrorMessage("Could not find the SC-55 MKI or MKII ROM files. Please select the folder where the ROM files are located.");
+        return Steinberg::kResultFalse;
+    }
+
+    // Start the LCD
+    m_emu->StartLCD();
 
     return Steinberg::kResultOk;
 }
 
 Steinberg::tresult PLUGIN_API Processor::terminate()
 {
+    // Stop the LCD
+    if (m_emu) {
+        m_emu->StopLCD();
+    }
+
     // Destroy the emulator
     m_emu.reset();
 

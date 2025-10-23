@@ -228,7 +228,15 @@ if(NUKED_ENABLE_VST3 AND WIN32)
         "src/vst3/processor.cpp"
         "src/vst3/controller.cpp"
         "src/vst3/editor.cpp"
+        "src/vst3/lcd_view.cpp"
     )
+
+    if(WIN32)
+        target_sources(nuked-sc55-vst3 PRIVATE
+            "src/vst3/win32_helper.cpp"
+        )
+        target_link_libraries(nuked-sc55-vst3 PRIVATE user32 shell32)
+    endif()
 
     # Link to the backend and the VST3 SDK
     target_link_libraries(nuked-sc55-vst3 PRIVATE nuked-sc55-backend Steinberg::vstsdk vstgui vstgui_support)
@@ -241,7 +249,7 @@ if(NUKED_ENABLE_VST3 AND WIN32)
     )
 
     # Add compiler definitions
-    target_compile_definitions(nuked-sc55-vst3 PRIVATE SMTG_RENAME_ASSERT=1)
+    target_compile_definitions(nuked-sc55-vst3 PRIVATE SMTG_RENAME_ASSERT=1 NUKED_VST3_BUILD)
 
     # For MSVC, we need to enable /bigobj
     if(MSVC)

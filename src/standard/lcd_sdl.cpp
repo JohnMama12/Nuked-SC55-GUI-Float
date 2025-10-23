@@ -331,9 +331,14 @@ void LCD_SDL_Backend::HandleEvent(const SDL_Event& sdl_event)
             int      mask           = 0;
             uint32_t button_pressed = m_lcd->mcu->button_pressed;
 
+#ifndef NUKED_VST3_BUILD
             auto button_map  = m_lcd->mcu->is_jv880 ? button_map_jv880 : button_map_sc55;
             auto button_size =
                 (m_lcd->mcu->is_jv880 ? sizeof(button_map_jv880) : sizeof(button_map_sc55)) / sizeof(button_map_sc55[0]);
+#else
+            auto button_map = button_map_sc55;
+            auto button_size = sizeof(button_map_sc55) / sizeof(button_map_sc55[0]);
+#endif
             for (size_t i = 0; i < button_size; i++)
             {
                 if (button_map[i][0] == sdl_event.key.keysym.scancode)

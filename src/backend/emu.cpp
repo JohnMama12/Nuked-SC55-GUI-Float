@@ -264,6 +264,11 @@ Romset EMU_DetectRomset(const std::filesystem::path& base_path)
 {
     for (size_t i = 0; i < (size_t)ROMSET_COUNT; i++)
     {
+#ifdef NUKED_VST3_BUILD
+        if ((Romset)i == Romset::JV880) {
+            continue;
+        }
+#endif
         bool good = true;
         for (size_t j = 0; j < 5; j++)
         {
@@ -355,10 +360,12 @@ bool Emulator::LoadRoms(Romset romset, MK1version revision)
             m_mcu->is_mk1   = true;
             m_mcu->is_cm300 = true;
             break;
+#ifndef NUKED_VST3_BUILD
         case Romset::JV880:
             m_mcu->is_jv880 = true;
             m_mcu->rom2_mask /= 2; // rom is half the size
             break;
+#endif
         case Romset::SCB55:
         case Romset::RLP3237:
             m_mcu->is_scb55 = true;

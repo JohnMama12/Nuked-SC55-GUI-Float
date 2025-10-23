@@ -1086,11 +1086,13 @@ FE_ParseError FE_ParseCommandLine(int argc, char* argv[], FE_Parameters& result)
             result.romset = Romset::CM300;
             result.autodetect = false;
         }
+#ifndef NUKED_VST3_BUILD
         else if (reader.Any("--jv880"))
         {
             result.romset = Romset::JV880;
             result.autodetect = false;
         }
+#endif
         else if (reader.Any("--scb55"))
         {
             result.romset = Romset::SCB55;
@@ -1285,11 +1287,14 @@ PERIOD -> ENCODER R
 
 )";
 
+#ifndef NUKED_VST3_BUILD
     if (romset == Romset::JV880)
     {
         fprintf(stderr, JV880_CONTROLS);
     }
-    else if (romset == Romset::MK1 || romset == Romset::MK2)
+    else
+#endif
+    if (romset == Romset::MK1 || romset == Romset::MK2)
     {
         fprintf(stderr, SC_55_CONTROLS);
     }

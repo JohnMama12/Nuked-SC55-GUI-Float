@@ -1,6 +1,7 @@
 #pragma once
 
 #include "public.sdk/source/vst/vstguieditor.h"
+#include "lcd_view.h"
 
 namespace VST3 {
 
@@ -12,7 +13,11 @@ public:
 
     // --- VSTGUI::VST3Editor overrides
     bool PLUGIN_API open(void* parent, const VSTGUI::PlatformType& platformType) override;
-    void PLUGIN_API close() override;
+    int32_t PLUGIN_API onKeyDown(VSTGUI::VstKeyCode& keyCode) override;
+    int32_t PLUGIN_API onKeyUp(VSTGUI::VstKeyCode& keyCode) override;
+
+private:
+    LCDView* m_lcdView = nullptr;
 };
 
 } // namespace VST3

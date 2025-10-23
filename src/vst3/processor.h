@@ -2,6 +2,7 @@
 
 #include "public.sdk/source/vst/vstaudioeffect.h"
 #include "backend/emu.h"
+#include "lcd_view.h"
 #include <memory>
 
 namespace VST3 {
@@ -26,9 +27,13 @@ public:
         return (Steinberg::Vst::IAudioProcessor*)new Processor();
     }
 
+    void setLCDView(LCDView* lcdView) { m_lcdView = lcdView; }
+    Emu* getEmu() const { return m_emu.get(); }
+
 private:
     std::unique_ptr<Emu> m_emu;
     double m_sampleRate = 0.0;
+    LCDView* m_lcdView = nullptr;
 };
 
 } // namespace VST3
