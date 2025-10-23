@@ -12,6 +12,7 @@ set(NUKED_SOURCE "unknown" CACHE STRING "Origin of this build")
 # Tests
 #==============================================================================
 option(NUKED_ENABLE_TESTS "Enable tests" OFF)
+option(NUKED_BUILD_STANDALONE "Build the standalone application" ON)
 set(NUKED_TEST_ROMDIR "" CACHE PATH
     "Directory the test runner should look for roms in")
 
@@ -23,20 +24,22 @@ endif()
 #==============================================================================
 # Dependencies
 #==============================================================================
-find_package(SDL2)
- 
-if(SDL2_FOUND)
-    message(STATUS "SDL2 FOUND - building standard frontend")
-else()
-    message(STATUS "SDL2 NOT FOUND - the standard frontend will not be built!")
-endif()
+if(NUKED_BUILD_STANDALONE)
+    find_package(SDL2)
 
-if(NOT WIN32)
-    set(USE_RTMIDI TRUE)
-endif()
+    if(SDL2_FOUND)
+        message(STATUS "SDL2 FOUND - building standard frontend")
+    else()
+        message(STATUS "SDL2 NOT FOUND - the standard frontend will not be built!")
+    endif()
 
-if(USE_RTMIDI AND SDL2_FOUND)
-    find_package(rtmidi MODULE REQUIRED)
+    if(NOT WIN32)
+        set(USE_RTMIDI TRUE)
+    endif()
+
+    if(USE_RTMIDI AND SDL2_FOUND)
+        find_package(rtmidi MODULE REQUIRED)
+    endif()
 endif()
 
 # ASIO
@@ -105,7 +108,7 @@ target_enable_warnings(nuked-sc55-backend)
 #==============================================================================
 # Standard frontend
 #==============================================================================
-if(SDL2_FOUND)
+if(NUKED_BUILD_STANDALONE AND SDL2_FOUND)
     add_executable(nuked-sc55)
     target_sources(nuked-sc55
         PRIVATE
