@@ -243,6 +243,10 @@ if(NUKED_ENABLE_VST3 AND WIN32)
 
     # Link to the backend and the VST3 SDK
     target_link_libraries(nuked-sc55-vst3 PRIVATE nuked-sc55-backend Steinberg::vstsdk vstgui vstgui_support)
+    target_include_directories(nuked-sc55-vst3 PRIVATE
+        "${CMAKE_SOURCE_DIR}/vendor/vst3sdk/vstgui4"
+        "${CMAKE_SOURCE_DIR}/vendor/vst3sdk/vstgui4/vstgui"
+    )
 
     # Set the output name and directory
     set_target_properties(nuked-sc55-vst3 PROPERTIES
@@ -253,6 +257,7 @@ if(NUKED_ENABLE_VST3 AND WIN32)
 
     # Add compiler definitions
     target_compile_definitions(nuked-sc55-vst3 PRIVATE SMTG_RENAME_ASSERT=1 NUKED_VST3_BUILD)
+    target_compile_features(nuked-sc55-vst3 PRIVATE cxx_std_23)
 
     # For MSVC, we need to enable /bigobj
     if(MSVC)
