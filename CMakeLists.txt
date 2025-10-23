@@ -35,7 +35,7 @@ if(NOT WIN32)
     set(USE_RTMIDI TRUE)
 endif()
 
-if(USE_RTMIDI)
+if(USE_RTMIDI AND SDL2_FOUND)
     find_package(rtmidi MODULE REQUIRED)
 endif()
 
@@ -211,3 +211,43 @@ target_enable_conversion_warnings(nuked-sc55-render)
 install(TARGETS nuked-sc55-render)
 install(FILES data/sc55_background.bmp DESTINATION ${CMAKE_INSTALL_DATADIR}/nuked-sc55)
 install(FILES data/nuked-icon-ico.ico DESTINATION ${CMAKE_INSTALL_DATADIR}/nuked-sc55)
+
+#==============================================================================
+# VST3 Plugin
+#==============================================================================
+option(NUKED_ENABLE_VST3 "Build the VST3 plugin" ON)
+
+if(NUKED_ENABLE_VST3 AND WIN32)
+    # VST3 SDK
+    # The VST3 SDK is included as a subdirectory.
+    add_subdirectory(vendor/vst3sdk)
+
+    # Create the VST3 plugin target
+    add_library(nuked-sc55-vst3 SHARED
+        "src/vst3/plugin.cpp"
+        "src/vst3/processor.cpp"
+        "src/vst3/controller.cpp"
+        "src/vst3/editor.cpp"
+    )
+
+    # Link to the backend and the VST3 SDK
+    target_link_libraries(nuked-sc55-vst3 PRIVATE nuked-sc55-backend Steinberg::vstsdk vstgui vstgui_support)
+
+    # Set the output name and directory
+    set_target_properties(nuked-sc55-vst3 PROPERTIES
+        OUTPUT_NAME "Nuked-SC55"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/VST3"
+        SUFFIX ".vst3"
+    )
+
+    # Add compiler definitions
+    target_compile_definitions(nuked-sc55-vst3 PRIVATE SMTG_RENAME_ASSERT=1)
+
+    # For MSVC, we need to enable /bigobj
+    if(MSVC)
+        target_compile_options(nuked-sc55-vst3 PRIVATE /bigobj)
+    endif()
+
+    # Install the VST3 plugin
+    install(TARGETS nuked-sc55-vst3 DESTINATION "VST3")
+endif()
