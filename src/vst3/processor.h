@@ -1,9 +1,10 @@
 #pragma once
 
 #include "public.sdk/source/vst/vstaudioeffect.h"
-#include "backend/emu.h"
 #include "lcd_view.h"
 #include <memory>
+
+class Emu;
 
 namespace VST3 {
 

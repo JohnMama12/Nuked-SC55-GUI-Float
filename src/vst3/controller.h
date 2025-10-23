@@ -2,6 +2,7 @@
 
 #include "public.sdk/source/vst/vsteditcontroller.h"
 #include "processor.h"
+#include "pluginterfaces/base/ipluginbase.h"
 
 namespace VST3 {
 

@@ -2,6 +2,7 @@
 
 #include "vstgui/lib/cview.h"
 #include "backend/lcd.h"
+#include "vstgui/lib/cdrawcontext.h"
 #include <memory>
 
 namespace VST3 {

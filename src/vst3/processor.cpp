@@ -1,10 +1,14 @@
 #include "processor.h"
 #include "backend/audio.h"
 #include "win32_helper.h"
+#include "backend/emu.h"
+#include "pluginterfaces/base/vsttypes.h"
+#include "pluginterfaces/vst/ivstevents.h"
 
 namespace VST3 {
 
 Processor::Processor()
+    : m_emu(nullptr)
 {
     // Set the bus arrangements
     addAudioInput(STR16("Stereo In"), Steinberg::Vst::SpeakerArr::kStereo);
@@ -96,8 +100,8 @@ Steinberg::tresult PLUGIN_API Processor::process(Steinberg::Vst::ProcessData& da
     // --- Process MIDI events
     Steinberg::Vst::IEventList* eventList = data.inputEvents;
     if (eventList) {
-        int32 numEvents = eventList->getEventCount();
-        for (int32 i = 0; i < numEvents; i++) {
+        Steinberg::int32 numEvents = eventList->getEventCount();
+        for (Steinberg::int32 i = 0; i < numEvents; i++) {
             Steinberg::Vst::Event event;
             if (eventList->getEvent(i, event) == Steinberg::kResultOk) {
                 if (event.type == Steinberg::Vst::Event::kNoteOnEvent) {
@@ -149,5 +153,5 @@ Steinberg::tresult PLUGIN_API Processor::getState(Steinberg::IBStream* state)
     // For now, we don't save any state
     return Steinberg::kResultOk;
 }
-
+}
 } // namespace VST3

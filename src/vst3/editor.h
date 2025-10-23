@@ -1,6 +1,6 @@
 #pragma once
 
-#include "public.sdk/source/vst/vstguieditor.h"
+#include "vstgui/vst3/vst3editor.h"
 #include "lcd_view.h"
 
 namespace VST3 {

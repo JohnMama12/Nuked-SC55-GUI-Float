@@ -2,6 +2,8 @@
 #include "lcd_view.h"
 #include "controller.h"
 #include "backend/mcu.h"
+#include "vstgui/lib/crect.h"
+#include "backend/lcd.h"
 
 namespace VST3 {
 
@@ -69,7 +71,9 @@ int32_t PLUGIN_API Editor::onKeyDown(VSTGUI::VstKeyCode& keyCode)
     if (mask != 0) {
         if (auto* controller = (Controller*)getController()) {
             if (auto* processor = controller->getProcessor()) {
-                processor->getEmu()->GetMCU().button_pressed |= mask;
+                if (auto* emu = processor->getEmu()) {
+                    emu->GetMCU().button_pressed |= mask;
+                }
             }
         }
         return 1;
@@ -105,7 +109,9 @@ int32_t PLUGIN_API Editor::onKeyUp(VSTGUI::VstKeyCode& keyCode)
     if (mask != 0) {
         if (auto* controller = (Controller*)getController()) {
             if (auto* processor = controller->getProcessor()) {
-                processor->getEmu()->GetMCU().button_pressed &= ~mask;
+                if (auto* emu = processor->getEmu()) {
+                    emu->GetMCU().button_pressed &= ~mask;
+                }
             }
         }
         return 1;

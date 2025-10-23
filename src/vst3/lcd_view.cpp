@@ -1,6 +1,7 @@
 #include "lcd_view.h"
 #include "vstgui/lib/cdrawcontext.h"
 #include "vstgui/lib/cbitmap.h"
+#include "vstgui/lib/coffscreencontext.h"
 
 namespace VST3 {
 
@@ -17,8 +18,8 @@ LCDView::~LCDView()
 void LCDView::draw(VSTGUI::CDrawContext* pContext)
 {
     // Create a bitmap from the buffer
-    auto bitmap = VSTGUI::CBitmap(getViewSize());
-    VSTGUI::COffscreenContext* offscreenContext = pContext->createOffscreenContext(getViewSize());
+    VSTGUI::CBitmap bitmap(getViewSize().getWidth(), getViewSize().getHeight());
+    VSTGUI::COffscreenContext* offscreenContext = VSTGUI::COffscreenContext::create(pContext, getViewSize().getWidth(), getViewSize().getHeight());
     offscreenContext->beginDraw();
     uint8_t* p = (uint8_t*)offscreenContext->getBitmap()->getPlatformBitmap()->getBufferAddress();
     for (int y = 0; y < LCD_HEIGHT; y++) {
@@ -33,7 +34,7 @@ void LCDView::draw(VSTGUI::CDrawContext* pContext)
     offscreenContext->endDraw();
     bitmap.setPlatformBitmap(offscreenContext->getBitmap()->getPlatformBitmap());
     pContext->drawBitmap(&bitmap, getViewSize());
-    delete offscreenContext;
+    offscreenContext->forget();
 }
 
 void LCDView::Refresh(const LCD_Pixel* buffer)
