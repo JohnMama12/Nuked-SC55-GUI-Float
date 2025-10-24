@@ -22,6 +22,11 @@ Steinberg::tresult PLUGIN_API NukedSC55Processor::initialize(Steinberg::FUnknown
     addAudioOutput(STR16("Stereo Out"), Steinberg::Vst::SpeakerArr::kStereo);
     addEventInput(STR16("Event In"), 1);
 
+    if (getController())
+    {
+        getController()->setDirty(true);
+    }
+
     return Steinberg::kResultOk;
 }
 
@@ -49,17 +54,26 @@ Steinberg::tresult PLUGIN_API NukedSC55Processor::process(Steinberg::Vst::Proces
                 Steinberg::Vst::Event event;
                 if (eventList->getEvent(i, event) == Steinberg::kResultOk)
                 {
-                    if (event.type == Steinberg::Vst::Event::kNoteOnEvent)
+                    switch (event.type)
                     {
+                    case Steinberg::Vst::Event::kNoteOnEvent:
                         m_emulator->PostMidi(0x90 | (event.noteOn.channel & 0x0F));
                         m_emulator->PostMidi(event.noteOn.pitch);
                         m_emulator->PostMidi(event.noteOn.velocity * 127.0f);
-                    }
-                    else if (event.type == Steinberg::Vst::Event::kNoteOffEvent)
-                    {
+                        break;
+                    case Steinberg::Vst::Event::kNoteOffEvent:
                         m_emulator->PostMidi(0x80 | (event.noteOff.channel & 0x0F));
                         m_emulator->PostMidi(event.noteOff.pitch);
                         m_emulator->PostMidi(event.noteOff.velocity * 127.0f);
+                        break;
+                    case Steinberg::Vst::Event::kPolyPressureEvent:
+                        m_emulator->PostMidi(0xA0 | (event.polyPressure.channel & 0x0F));
+                        m_emulator->PostMidi(event.polyPressure.pitch);
+                        m_emulator->PostMidi(event.polyPressure.pressure * 127.0f);
+                        break;
+                    case Steinberg::Vst::Event::kDataEvent:
+                        m_emulator->PostMidi(event.data.bytes, event.data.size);
+                        break;
                     }
                 }
             }
@@ -69,14 +83,20 @@ Steinberg::tresult PLUGIN_API NukedSC55Processor::process(Steinberg::Vst::Proces
         Steinberg::Vst::AudioBusBuffers& outputBuffers = data.outputs[0];
         float* leftBuffer = outputBuffers.channelBuffers32[0];
         float* rightBuffer = outputBuffers.channelBuffers32[1];
+
+        struct AudioBuffer
+        {
+            float* left;
+            float* right;
+        } buffer = {leftBuffer, rightBuffer};
+
         m_emulator->SetSampleCallback(
             [](void* user, int16_t left, int16_t right) {
-                float*& leftBuffer = *(float**)user;
-                float*& rightBuffer = *(float**)(user + sizeof(float*));
-                *leftBuffer++ = left / 32768.0f;
-                *rightBuffer++ = right / 32768.0f;
+                AudioBuffer* buffer = static_cast<AudioBuffer*>(user);
+                *buffer->left++ = left / 32768.0f;
+                *buffer->right++ = right / 32768.0f;
             },
-            &leftBuffer);
+            &buffer);
 
         for (int32 i = 0; i < data.numSamples; i++)
         {
@@ -99,12 +119,28 @@ Steinberg::tresult PLUGIN_API NukedSC55Processor::canProcessSampleSize(Steinberg
 
 Steinberg::tresult PLUGIN_API NukedSC55Processor::setState(Steinberg::IBStream* state)
 {
-    // TODO: Implement saving the plugin state
+    if (!state)
+    {
+        return Steinberg::kInvalidArgument;
+    }
+
+    m_emulator->SaveState([&](const void* data, size_t size) {
+        state->write(data, size);
+    });
+
     return Steinberg::kResultOk;
 }
 
 Steinberg::tresult PLUGIN_API NukedSC55Processor::getState(Steinberg::IBStream* state)
 {
-    // TODO: Implement loading the plugin state
+    if (!state)
+    {
+        return Steinberg::kInvalidArgument;
+    }
+
+    m_emulator->LoadState([&](void* data, size_t size) {
+        state->read(data, size);
+    });
+
     return Steinberg::kResultOk;
 }

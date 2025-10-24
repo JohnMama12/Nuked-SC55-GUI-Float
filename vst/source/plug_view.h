@@ -1,6 +1,7 @@
 #pragma once
 
 #include "public.sdk/source/vst/vstguieditor.h"
+#include "backend/lcd.h"
 
 #if VSTGUI_ENABLED
 
@@ -9,9 +10,10 @@
 
 namespace VSTGUI {
 class CBitmap;
+class CView;
 }
 
-class NukedSC55View : public Steinberg::Vst::VSTGUIEditor, public VSTGUI::CControlListener
+class NukedSC55View : public Steinberg::Vst::VSTGUIEditor, public VSTGUI::CControlListener, public LCD_Backend
 {
 public:
     NukedSC55View(void* controller);
@@ -21,8 +23,15 @@ public:
 
     void valueChanged(VSTGUI::CControl* pControl) override;
 
+    // LCD_Backend
+    void Render() override;
+    bool Start(lcd_t& lcd) override { m_lcd = &lcd; return true; }
+    void Stop() override {}
+
 private:
     VSTGUI::CBitmap* m_background;
+    VSTGUI::CView* m_lcdView;
+    lcd_t* m_lcd;
 };
 
 #endif

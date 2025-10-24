@@ -2,6 +2,8 @@
 
 #include "public.sdk/source/vst/vsteditcontroller.h"
 
+class LCD_Backend;
+
 class NukedSC55Controller : public Steinberg::Vst::EditController
 {
 public:
@@ -18,4 +20,6 @@ public:
     }
 
     static Steinberg::FUID uid;
+
+    LCD_Backend* m_lcd_backend;
 };
