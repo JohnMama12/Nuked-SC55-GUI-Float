@@ -1,54 +1,69 @@
 # Building the Nuked SC-55 VST3 Plugin
 
-This guide provides instructions on how to build the Nuked SC-55 VST3 plugin from source on a Debian-based Linux distribution like Ubuntu.
+This guide provides instructions on how to build the Nuked SC-55 VST3 plugin from source.
 
 ## Prerequisites
 
-Before you begin, you will need to install the following dependencies:
+Before you begin, ensure you have the following software installed:
 
-*   **Git, CMake, and a C++ compiler:**
-    ```bash
-    sudo apt-get update
-    sudo apt-get install -y git cmake build-essential
-    ```
+*   **Git:** For version control.
+*   **CMake:** For building the project (version 3.19 or higher).
+*   **A C++17 compliant compiler:** Such as GCC, Clang, or MSVC.
 
-*   **X11/XCB libraries:** VSTGUI requires a number of X11 and XCB libraries for its user interface. You can install them all with the following command:
-    ```bash
-    sudo apt-get install -y libxcb1-dev libxkbcommon-dev libxcb-util0-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-glx0-dev libxkbcommon-x11-dev libxcb-cursor-dev libxcb-ewmh-dev
-    ```
+### Dependencies
 
-*   **Other UI libraries:** VSTGUI also depends on a few other libraries for UI rendering and font handling.
-    ```bash
-    sudo apt-get install -y libglib2.0-dev libcairo2-dev libpango1.0-dev
-    ```
+The VST3 plugin relies on several libraries for its user interface, provided by the VSTGUI framework. You will need to have the development packages for these libraries installed on your system. The required libraries are:
+
+*   **X11 / XCB:** A suite of libraries for the X Window System.
+*   **fontconfig:** For managing fonts.
+*   **freetype:** For font rendering.
+*   **glib-2.0:** A core utility library.
+*   **cairo:** A 2D graphics library.
+*   **pango:** A library for laying out and rendering of text.
+
+Please use your system's package manager (e.g., `apt-get` on Debian/Ubuntu, `brew` on macOS, `vcpkg` on Windows) to install these dependencies.
 
 ## Build Steps
 
-1.  **Clone the repository:**
+1.  **Clone the Repository**
+
+    First, clone the main repository from GitHub:
     ```bash
-    git clone --recursive https://github.com/linoshkmalayil/Nuked-SC55.git
+    git clone https://github.com/linoshkmalayil/Nuked-SC55.git
+    cd Nuked-SC55
     ```
 
-2.  **Navigate to the VST directory:**
+2.  **Initialize Submodules**
+
+    The project uses git submodules to manage external dependencies, including the Steinberg VST3 SDK. It's crucial to initialize them correctly.
+
+    If you cloned the repository without the `--recursive` flag, you can initialize the submodules with this command:
     ```bash
-    cd Nuked-SC55/vst
+    git submodule update --init --recursive
     ```
 
-3.  **Create a build directory:**
-    ```bash
-    mkdir build && cd build
-    ```
+3.  **Configure the Build with CMake**
 
-4.  **Configure the build with CMake:**
+    The VST3 plugin has a dedicated build configuration located in the `vst/` directory.
+
     ```bash
+    cd vst
+    mkdir build
+    cd build
     cmake ..
     ```
 
-5.  **Build the plugin:**
+4.  **Build the Plugin**
+
+    Once CMake has configured the project, you can build the plugin:
     ```bash
     cmake --build .
+    ```
+    For a release build, you can specify the configuration:
+    ```bash
+    cmake --build . --config Release
     ```
 
 ## Output
 
-The compiled VST3 plugin, `Nuked SC-55.vst3`, will be located in the `vst/build/VST3/` directory. You can then copy this file to your VST3 plugin directory (e.g., `~/.vst3/`).
+The compiled VST3 plugin, `Nuked SC-55.vst3`, will be located in the `vst/build/VST3/Release/` (or `Debug`) directory. You can then copy this file to your system's VST3 plugin directory (e.g., `~/.vst3/` on Linux, `~/Library/Audio/Plug-Ins/VST3/` on macOS, or `C:\Program Files\Common Files\VST3\` on Windows).
