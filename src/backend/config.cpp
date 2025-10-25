@@ -1,4 +1,5 @@
 #include "config.h"
+#include <cstdio>
 
 void Cfg_WriteVersionInfo(FILE* file)
 {

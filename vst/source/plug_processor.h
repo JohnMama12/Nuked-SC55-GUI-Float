@@ -1,6 +1,6 @@
 #pragma once
 
-#include "public.sdk/source/vst/vstaudioeffect.h"
+#include "../../vendor/vst3sdk/public.sdk/source/vst/vstaudioeffect.h"
 #include "backend/emu.h"
 
 class NukedSC55Processor : public Steinberg::Vst::AudioEffect
