@@ -1,5 +1,6 @@
 #include "plug_controller.h"
 #include "plug_view.h"
+#include "plug_view.h"
 
 Steinberg::FUID NukedSC55Controller::uid(0x90ABCDEF, 0x12345678, 0x90ABCDEF, 0x12345678);
 
@@ -9,7 +10,7 @@ NukedSC55Controller::NukedSC55Controller()
 
 Steinberg::tresult PLUGIN_API NukedSC55Controller::initialize(Steinberg::FUnknown* context)
 {
-    tresult result = EditController::initialize(context);
+    Steinberg::tresult result = EditController::initialize(context);
     return result;
 }
 

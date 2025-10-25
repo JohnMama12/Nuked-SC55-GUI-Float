@@ -1,39 +1,32 @@
 cmake_minimum_required(VERSION 3.19)
-project(NukedSC55VST)
+project(NukedSC55VST VERSION 1.0.0)
 
 # VST3 SDK
-add_subdirectory(../vendor/vst3sdk ${CMAKE_CURRENT_BINARY_DIR}/vst3sdk)
-
-# Backend library
-add_library(nuked-sc55-backend
-    ../src/backend/config.cpp
-    ../src/backend/emu.cpp
-    ../src/backend/lcd.cpp
-    ../src/backend/mcu.cpp
-    ../src/backend/mcu_interrupt.cpp
-    ../src/backend/mcu_opcodes.cpp
-    ../src/backend/mcu_timer.cpp
-    ../src/backend/path_util.cpp
-    ../src/backend/pcm.cpp
-    ../src/backend/submcu.cpp
-)
-target_include_directories(nuked-sc55-backend
-    PUBLIC
-    ../src/backend
-    ${CMAKE_CURRENT_BINARY_DIR}/backend
-)
-target_compile_features(nuked-sc55-backend PRIVATE cxx_std_23)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/vst3sdk ${CMAKE_BINARY_DIR}/vst3sdk)
+smtg_enable_vst3_sdk()
 
 # VST3 plugin
-add_library(NukedSC55VST MODULE
+smtg_add_vst3plugin(NukedSC55VST
     "source/plug.cpp"
+    "source/plug_processor.h"
     "source/plug_processor.cpp"
+    "source/plug_controller.h"
     "source/plug_controller.cpp"
+    "source/plug_view.cpp"
     "source/version.h"
 )
+target_include_directories(NukedSC55VST PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/vendor/vst3sdk
+    ${CMAKE_SOURCE_DIR}/vendor/vst3sdk/public.sdk/source/vst
+    ${CMAKE_SOURCE_DIR}/vendor/vst3sdk/vstgui4
+)
+target_compile_features(NukedSC55VST PRIVATE cxx_std_23)
 target_link_libraries(NukedSC55VST
     PRIVATE
-    vstsdk
+    sdk
+    sdk_hosting
+    sdk_common
     PUBLIC
     nuked-sc55-backend
 )

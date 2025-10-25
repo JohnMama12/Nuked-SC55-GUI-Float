@@ -1,6 +1,19 @@
 cmake_minimum_required (VERSION 3.19)
 project (nuked-SC55 VERSION 0.5.6 LANGUAGES CXX)
 
+# Ensure Release mode (defines NDEBUG automatically)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+# Propagate build flags to all subprojects
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Make sure both the VST3 SDK and plugin see NDEBUG
+add_compile_definitions(NDEBUG)
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
@@ -211,3 +224,5 @@ target_enable_conversion_warnings(nuked-sc55-render)
 install(TARGETS nuked-sc55-render)
 install(FILES data/sc55_background.bmp DESTINATION ${CMAKE_INSTALL_DATADIR}/nuked-sc55)
 install(FILES data/nuked-icon-ico.ico DESTINATION ${CMAKE_INSTALL_DATADIR}/nuked-sc55)
+
+add_subdirectory(vst)
